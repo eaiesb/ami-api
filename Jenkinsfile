@@ -49,6 +49,6 @@ steps {
 // steps
 def buildsrc() {
 dir ('.' ) {
-       "C:\apache-maven-3.6.1\bin\mvn clean package mule:deploy -Denv=qa"
+       mvn.cmd 'C:\apache-maven-3.6.1\bin\mvn clean package mule:deploy -Denv=qa'
 }
 }
