@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<anypoint-mq:default-subscriber-config name="Anypoint_MQ_Default_subscriber" doc:name="Anypoint MQ Default subscriber" doc:id="77b9a8c8-1c56-4eaf-8b03-9cd7f4c9c20d" >
+		<anypoint-mq:connection clientId="a20d673f41474beaa006a18cfda465b8" clientSecret="C147a744d85d4e51A26EC91B4417d0e8" />
+	</anypoint-mq:default-subscriber-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="1e8b89cf-eb35-43aa-8a11-48baf2c38bf6">
+		<http:request-connection host="dc.services.visualstudio.com" port="443" protocol="HTTPS">
+			<http:client-socket-properties >
+				<sockets:tcp-client-socket-properties />
+			</http:client-socket-properties>
+		</http:request-connection>
+	</http:request-config>
+	
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="15b12c3c-5b0d-4658-9510-fb5b2a4d396a" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="tirehubtestFlow" doc:id="85d3e32e-689c-45a8-90c3-005b7224fc80" >
+		<ee:transform doc:name="Transform Message" doc:id="00457e4b-cf4b-4945-b7c5-6c75109ece85" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  op_iKey: p('secure::azure.ai.ikey')  default "",
+  op_roleInstance: p('secure::azure.ai.roleInstance') default "",
+  op_id: "" ++ 1 as String default "",
+  op_parentid: "" ++ 2 as String default "",
+  op_name: "Azure Test from Mule 4",
+  basedata_name: "Azure Test from Mule 4.",
+  Request_URL: "/api/test",
+  op_timetaken_millisec: ((10 as Number) - (7 as Number) as Number) default 0,
+  logpayload: "Azure Test from Mule 4" default ""
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<anypoint-mq:publish doc:name="Publishtoq" doc:id="d3fedca6-232e-4b63-b435-5e5c031c57f2" config-ref="Anypoint_MQ_Default_subscriber" destination="eaiesb.test.q"/>
+		<logger level="INFO" doc:name="Logger" doc:id="dc9162e7-1a58-41b8-b09b-43082a5db2f1" message='"completed"'/>
+	</flow>
+	<flow name="azuretestFlow" doc:id="fc82ea21-3e3f-48b4-ab2c-cd140b4a1355" >
+		<anypoint-mq:subscriber doc:id="96c27a35-0c62-478c-bc08-c4ac2619f7fc" config-ref="Anypoint_MQ_Default_subscriber" destination="eaiesb.test.q" doc:name="Subscriber" />
+		<ee:transform doc:name="Transform Message" doc:id="65374ab0-a61d-43dc-b56f-b0da9952b585" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"name": "event" default 'Microsoft.ApplicationInsights.Event',
+	"time": now() as String {format:"yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS"},
+	"iKey": payload.op_iKey,
+	"tags": {
+		"ai.cloud.roleInstance": payload.op_roleInstance,
+		"ai.operation.id": payload.op_id default "",
+		"ai.operation.parentId": payload.op_parentid default "",
+		"ai.operation.name": payload.op_name default "",
+		"ai.internal.sdkVersion": "1.7" default "1.0"
+	},
+	"data": {
+		"baseType": "EventData" default 'EventData',
+		"baseData": {
+			"ver": 2,
+			"name": payload.basedata_name default "",
+			"properties": {
+				"input payload": payload.logpayload default ""
+			}
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="PostAppinsights" doc:id="35cc9ee5-5e6a-4f9b-8eeb-67bf345d98a1" path="/v2/track" config-ref="HTTP_Request_configuration">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="7011438b-ffaf-4a58-8641-5b25d6ce26b3" message='"Published successfully"' />
+	</flow>
+</mule>

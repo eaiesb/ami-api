@@ -1,0 +1,67 @@
+#%RAML 1.0
+baseUri: https://mocksvc.mulesoft.com/mocks/bd6a4706-fcfc-47fb-9890-00951da9fb21 # baseUri: https://mocksvc.mulesoft.com/mocks/4094c27e-c53b-4083-a2ac-946f63c728ac # 
+title: AMI API
+version: v1
+
+mediaType: application/json
+protocols: [HTTPS]
+description: AMI API specifically for AMI customer based on Tirehub orders and inventory information
+
+types:  
+  OrderCreateRequest: !include data-types/order-create-request-data-type.raml
+  OrderCreateResult: !include data-types/order-create-response-data-type.raml
+  OrderStatusResult: !include data-types/order-status-response-data-type.raml
+  InventoryStatusRequest: !include data-types/inventory-request-data-type.raml
+  InventoryStatusResponse: !include data-types/inventory-response-data-type.raml
+  
+/order:
+  post:
+    queryParameters: 
+      Signature:
+        required: true
+        type: string
+        description: The signature of the consumer. A consumer needs to sign his request in order to get a successful response. 
+    body: 
+      type: OrderCreateRequest
+      example: !include examples/order-create-ami-request-example.raml
+    responses: 
+      200:
+        body: 
+          type: OrderCreateResult[] 
+          example: !include examples/order-create-ami-response-example.raml
+  /{orderNo}:
+    uriParameters: 
+      orderNo: number   
+    get:
+      queryParameters: 
+        Timestamp:
+          required: true
+          type: string
+          description: The timestamp of the request. 
+        Signature:
+          required: true
+          type: string
+          description: The signature of the consumer. A consumer needs to sign his request in order to get a successful response. 
+      responses: 
+        200:
+          body: 
+            type: OrderStatusResult[]
+            example: !include examples/order-status-ami-response-example.raml
+
+/inventory:
+  /{dealerCode}:
+    uriParameters: 
+      dealerCode:
+        required: true
+        type: string
+        displayName: dealerCode
+    post:
+      body: 
+        type: InventoryStatusRequest
+        example: !include examples/inventory-request-example.raml
+      responses: 
+        200:
+          body: 
+            application/json:  
+              type: InventoryStatusResponse
+              example: !include examples/inventory-response-example.raml

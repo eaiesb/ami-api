@@ -1,0 +1,42 @@
+#%RAML 1.0 DataType
+type: object
+properties:
+  dealerCode:
+    required: true
+    type: string
+    description: The dealer's code to place the order
+  dealerReference:
+    required: false
+    type: string
+    description: The dealer's reference
+  type:
+    required: true
+    type: string
+    description: The type of order (e.g. delivery, pickup)
+  items:
+    required: false
+    description: The items array included in the order
+    type: array
+    items: 
+      type: object
+      properties:   
+        brandName:
+          required: true
+          type: string
+          description: The brand name of the item
+        partNo:
+          required: true
+          type: string
+          description: The part number of the item 
+        warehouseId:
+          required: true
+          type: string
+          description: The warehouse id of the item
+        qty:
+          required: true
+          type: number
+          description: The quantity of the item
+  placed:
+    required: true
+    type: string
+    description: The placed time of the order

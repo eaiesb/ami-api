@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	
+		<global-property doc:name="Global Property" doc:id="3623c7be-4937-4763-8f0c-bdc5bda9f831" name="mule.key" value="mulesoft" />
+	
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="91e0a0ff-ea47-4b7b-b55f-8a710b11e511" file="configuration-${env}.properties" key="${mule.key}" />
+	<flow name="getOrderFlow" doc:id="429e97b0-5a67-4a61-9d01-ce3cddd44774" >
+		<ee:transform doc:name="Transform Message" doc:id="348e945e-b82f-49a1-aba4-cd51c3b0f2cf" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[
+  {
+    status: "AtDC",
+    estDelivery: "2018-05-15T00:00:00Z",
+    warehouse: {
+      id: "109",
+      name: "FDC 109 KANSAS CITY",
+      address: "1234 SALINE ST",
+      address2: null,
+      city: "NORTH KANSAS CITY",
+      state: "MO",
+      postalCode: "64116-4409"
+    },
+    pickUpPhone: "123123123",
+    Message: p('message')
+  }
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Publish to Azure" doc:id="e7aeafb4-c723-4e4f-8730-bc6b83ac401a" name="tirehubtestFlow"/>
+	</flow>
+</mule>

@@ -1,0 +1,36 @@
+#%RAML 1.0 DataType
+type: object
+properties: 
+  status: 
+    type: string
+    description: Status of the item in the order
+  estDelivery: 
+    type: string
+    description: Estimated delivery of the item
+  warehouse: 
+    type: object
+    properties:   
+      id: 
+        type: string
+        description: ID of the warehouse
+      name: 
+        type: string
+        description: Name of the warehouse
+      address: 
+        type: string
+        description: Address of the warehouse
+      address2?:  
+        type: string | nil
+        description: Address 2 of the warehouse
+      city: 
+        type: string
+        description: City of the warehouse
+      state: 
+        type: string
+        description: State of the warehouse
+      postalCode: 
+        type: string
+        description: Postal code of the warehouse
+  pickUpPhone?:  
+    type: string | nil
+    description: Pick up phone number

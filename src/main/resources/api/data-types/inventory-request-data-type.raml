@@ -1,0 +1,25 @@
+#%RAML 1.0 DataType
+description: ATP AMI 2 Service Inventory Request
+type: array
+items:
+  type: object
+  properties:
+    brandName:
+      type: string
+      required: false
+    partNo:
+      type: string
+      required: false  
+    warehouses:
+      type: array
+      required: false
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            required: false
+          oecLocationId:
+            type: string
+            required: false
+      
