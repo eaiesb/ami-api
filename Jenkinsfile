@@ -18,6 +18,7 @@ steps {
 }
 
 }  	
+
    post {
       failure {
                 slackSend (color: "0000ff", message: 'ami-api Build failed')
@@ -49,6 +50,6 @@ steps {
 // steps
 def buildsrc() {
 dir ('.' ) {
-        sh '/devops/maven/apache-maven-3.3.9/mvn clean package mule:deploy -Denv=qa'
+     sh '/devops/maven/apache-maven-3.3.9/mvn clean package mule:deploy -Denv=qa'
 }
 }
