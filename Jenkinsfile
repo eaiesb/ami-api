@@ -17,8 +17,25 @@ steps {
       }
 }
 
-}  	
+stage('Upload Files To Artifactory') {
+    steps {
+        script{
+        sh "echo ${env.GIT_URL} > /tmp/giturl.txt"
+     def server = Artifactory.server 'artifactory'
+     def uploadSpec = """{
+  "files": [
+    {
+      "pattern": "**/*.zip",
+      "target": "generic-local/ami-api/ami-api.zip"
+    }
+ ]
+}"""                 
+              def buildInfo1 = server.upload spec: uploadSpec
 
+            }
+    }
+}  	
+}
    post {
       failure {
                 slackSend (color: "0000ff", message: 'ami-api Build failed')
@@ -34,7 +51,7 @@ steps {
         }
       success {
           slackSend (color: "0000ff", message: 'ami-api Build sucess')
-          slackSend (color: "#FFA500",message: 'ami-api Uploaded Sucessfully')
+          slackSend (color: "#FFA500",message: 'ami-api Artifacts Uploaded Sucessfully')
          emailext attachLog: true, mimeType: 'text/html', body: '''The jenkins build details are as follows:<br> <br>
 <table border="1">
 <tr><td style="background-color:#33339F;color:white"><b>Job Name</b></td><td>$JOB_NAME</td></tr>
@@ -50,6 +67,6 @@ steps {
 // steps
 def buildsrc() {
 dir ('.' ) {
-     sh '/devops/maven/apache-maven-3.3.9/mvn clean package mule:deploy -Denv=qa'
+     sh '/devops/maven/apache-maven-3.3.9/bin/mvn clean package mule:deploy'
 }
 }
