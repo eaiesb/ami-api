@@ -25,8 +25,8 @@ stage('Upload Files To Artifactory') {
      def uploadSpec = """{
   "files": [
     {
-      "pattern": "**/*.zip",
-      "target": "generic-local/ami-api/ami-api.zip"
+      "pattern": "**/*.jar",
+      "target": "generic-local/ami-api/ami-api.jar"
     }
  ]
 }"""                 
