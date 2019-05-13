@@ -18,7 +18,6 @@ steps {
 }
 
 }  	
-}
    post {
       failure {
                 slackSend (color: "0000ff", message: 'ami-api Build failed')
