@@ -46,7 +46,7 @@ stage('Upload Files To Artifactory') {
 <tr><td style="background-color:white;color:red"><b>GIT URL</b></td><td>${FILE, path="/tmp/giturl.txt"}</td></tr>
 <tr><td style="background-color:white;color:red"><b>Build URL</b></td><td>$BUILD_URL</td></tr>
 </table>
-''', subject: 'ami-api Deployment Status', to: 'srikanth.bathini@eaiesb.com'
+''', subject: 'ami-api Deployment Status', to: 'manoj.gundam@eaiesb.com'
            slackSend (color: "#FF0001",message: 'ami-api Deployment Failed')
         }
       success {
@@ -59,7 +59,7 @@ stage('Upload Files To Artifactory') {
 <tr><td style="background-color:#33339F;color:white"><b>GIT URL</b></td><td>${FILE, path="/tmp/giturl.txt"}</td></tr>
 <tr><td style="background-color:#33339F;color:white"><b>Build URL</b></td><td>$BUILD_URL</td></tr>
 </table>
-''', subject: 'Jenkins ${BUILD_STATUS} [#${BUILD_NUMBER}] - ${PROJECT_NAME} ${ENV, var="GIT_URL"}', to: 'srikanth.bathini@eaiesb.com'    
+''', subject: 'Jenkins ${BUILD_STATUS} [#${BUILD_NUMBER}] - ${PROJECT_NAME} ${ENV, var="GIT_URL"}', to: 'manoj.gundam@eaiesb.com'    
           slackSend (color: "#32CD32", message: 'ami-api Deployment is Sucessful')
         }
   }
